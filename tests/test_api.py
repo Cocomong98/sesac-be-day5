@@ -29,8 +29,10 @@ class TestRootEndpoint:
         assert "/ui" in response.headers.get("location", "")
 
 
-from langchain_core.messages import HumanMessage, AIMessage
 from unittest.mock import AsyncMock, patch
+
+from langchain_core.messages import AIMessage, HumanMessage
+
 
 class TestChatEndpoints:
     """채팅 API 엔드포인트 테스트"""
@@ -58,7 +60,7 @@ class TestChatEndpoints:
                 "session_id": "test-session",
             },
         )
-        
+
         assert response.status_code == 200
         data = response.json()
         assert data["message"] == "반가워! 루미야~"
@@ -83,7 +85,6 @@ class TestChatEndpoints:
             },
         )
         assert response.status_code == 422
-
 
 
 class TestHealthEndpoints:

@@ -52,6 +52,8 @@ async def readiness_check() -> dict:
         "timestamp": datetime.utcnow().isoformat() + "Z",
         "checks": {
             "upstage_api_key": bool(settings.upstage_api_key),
-            "supabase_configured": bool(settings.supabase_url and settings.supabase_key),
+            "supabase_configured": bool(
+                settings.supabase_url and settings.supabase_key
+            ),
         },
     }
