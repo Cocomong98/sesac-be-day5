@@ -23,39 +23,36 @@
 #   - (Redis는 6강에서 추가 예정)
 
 services:
-  # =============================================================
-  # 메인 에이전트 서비스
-  # =============================================================
-  lumi-agent:
-    # 이미지 및 빌드 설정
-    image: ${LUMI_IMAGE:-lumi-agent:latest}
-    build:
-      context: .
-      dockerfile: Dockerfile
+    # =============================================================
+    # 메인 에이전트 서비스
+    # =============================================================
+    lumi-agent:
+        # 이미지 및 빌드 설정
+        image: ${LUMI_IMAGE:-lumi-agent:latest}
+        build:
+            context: .
+            dockerfile: Dockerfile
 
+        # 포트 매핑 (호스트:컨테이너)
+        ports:
+            - "8000:8000"
 
-    # 포트 매핑 (호스트:컨테이너)
-    ports:
-      - "8000:8000"
+        # 환경변수 설정
+        env_file:
+            - .env
+        environment:
+            ENVIRONMENT: ${ENVIRONMENT:-development}
+            DEBUG: ${DEBUG:-false}
+            UPSTAGE_API_KEY: ${UPSTAGE_API_KEY:-}
+            LLM_MODEL: ${LLM_MODEL:-solar-pro2}
+            SUPABASE_URL: ${SUPABASE_URL:-}
+            SUPABASE_KEY: ${SUPABASE_KEY:-}
 
-
-    # 환경변수 설정
-    env_file:
-      - .env
-    environment:
-      ENVIRONMENT: ${ENVIRONMENT:-development}
-      DEBUG: ${DEBUG:-true}
-      UPSTAGE_API_KEY: ${UPSTAGE_API_KEY:-}
-      LLM_MODEL: ${LLM_MODEL:-solar-pro2}
-      SUPABASE_URL: ${SUPABASE_URL:-}
-      SUPABASE_KEY: ${SUPABASE_KEY:-}
-
-
-    # 헬스체크 및 재시작 정책 설정
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health/"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
-    restart: unless-stopped
+        # 헬스체크 및 재시작 정책 설정
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health/"]
+            interval: 30s
+            timeout: 10s
+            retries: 3
+            start_period: 10s
+        restart: unless-stopped
