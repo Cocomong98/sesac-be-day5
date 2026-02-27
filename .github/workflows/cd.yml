@@ -188,21 +188,19 @@ jobs:
             ENV_EOF
             echo "✅ .env 파일 생성 완료!"
 
-            # Docker Compose 명령어 설정 (plugin 우선, 없으면 standalone 보정/설치)
+            # Docker Compose 명령어 설정 (plugin 우선, standalone은 정상 동작 검증 후 사용)
             if docker compose version &> /dev/null; then
               DOCKER_COMPOSE="docker compose"
-            elif command -v docker-compose &> /dev/null; then
-              DOCKER_COMPOSE_BIN=$(command -v docker-compose)
-              if [ ! -x "$DOCKER_COMPOSE_BIN" ]; then
-                echo "⚠️ docker-compose 실행 권한 수정 중..."
-                chmod +x "$DOCKER_COMPOSE_BIN" || sudo chmod +x "$DOCKER_COMPOSE_BIN"
-              fi
+            elif command -v docker-compose &> /dev/null && docker-compose version &> /dev/null; then
               DOCKER_COMPOSE="docker-compose"
             else
-              echo "📦 docker-compose 설치 중..."
-              sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-              sudo chmod +x /usr/local/bin/docker-compose
-              DOCKER_COMPOSE="/usr/local/bin/docker-compose"
+              echo "📦 docker-compose(standalone) 사용자 홈에 설치 중..."
+              mkdir -p "${HOME}/.local/bin"
+              COMPOSE_BIN="${HOME}/.local/bin/docker-compose"
+              curl -fL "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o "${COMPOSE_BIN}"
+              chmod +x "${COMPOSE_BIN}"
+              "${COMPOSE_BIN}" version >/dev/null
+              DOCKER_COMPOSE="${COMPOSE_BIN}"
             fi
 
             # 현재 버전 백업 (롤백용)
@@ -275,21 +273,19 @@ jobs:
 
             cd /home/${{ secrets.EC2_USERNAME }}/lumi-agent
 
-            # Docker Compose 명령어 설정 (plugin 우선, 없으면 standalone 보정/설치)
+            # Docker Compose 명령어 설정 (plugin 우선, standalone은 정상 동작 검증 후 사용)
             if docker compose version &> /dev/null; then
               DOCKER_COMPOSE="docker compose"
-            elif command -v docker-compose &> /dev/null; then
-              DOCKER_COMPOSE_BIN=$(command -v docker-compose)
-              if [ ! -x "$DOCKER_COMPOSE_BIN" ]; then
-                echo "⚠️ docker-compose 실행 권한 수정 중..."
-                chmod +x "$DOCKER_COMPOSE_BIN" || sudo chmod +x "$DOCKER_COMPOSE_BIN"
-              fi
+            elif command -v docker-compose &> /dev/null && docker-compose version &> /dev/null; then
               DOCKER_COMPOSE="docker-compose"
             else
-              echo "📦 docker-compose 설치 중..."
-              sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-              sudo chmod +x /usr/local/bin/docker-compose
-              DOCKER_COMPOSE="/usr/local/bin/docker-compose"
+              echo "📦 docker-compose(standalone) 사용자 홈에 설치 중..."
+              mkdir -p "${HOME}/.local/bin"
+              COMPOSE_BIN="${HOME}/.local/bin/docker-compose"
+              curl -fL "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o "${COMPOSE_BIN}"
+              chmod +x "${COMPOSE_BIN}"
+              "${COMPOSE_BIN}" version >/dev/null
+              DOCKER_COMPOSE="${COMPOSE_BIN}"
             fi
 
             if [ ! -f ".previous_image" ]; then
