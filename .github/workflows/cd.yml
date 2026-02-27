@@ -188,11 +188,21 @@ jobs:
             ENV_EOF
             echo "✅ .env 파일 생성 완료!"
 
-            # Docker Compose 명령어 설정
+            # Docker Compose 명령어 설정 (plugin 우선, 없으면 standalone 보정/설치)
             if docker compose version &> /dev/null; then
               DOCKER_COMPOSE="docker compose"
-            else
+            elif command -v docker-compose &> /dev/null; then
+              DOCKER_COMPOSE_BIN=$(command -v docker-compose)
+              if [ ! -x "$DOCKER_COMPOSE_BIN" ]; then
+                echo "⚠️ docker-compose 실행 권한 수정 중..."
+                chmod +x "$DOCKER_COMPOSE_BIN" || sudo chmod +x "$DOCKER_COMPOSE_BIN"
+              fi
               DOCKER_COMPOSE="docker-compose"
+            else
+              echo "📦 docker-compose 설치 중..."
+              sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+              sudo chmod +x /usr/local/bin/docker-compose
+              DOCKER_COMPOSE="/usr/local/bin/docker-compose"
             fi
 
             # 현재 버전 백업 (롤백용)
@@ -265,11 +275,21 @@ jobs:
 
             cd /home/${{ secrets.EC2_USERNAME }}/lumi-agent
 
-            # Docker Compose 명령어 설정
+            # Docker Compose 명령어 설정 (plugin 우선, 없으면 standalone 보정/설치)
             if docker compose version &> /dev/null; then
               DOCKER_COMPOSE="docker compose"
-            else
+            elif command -v docker-compose &> /dev/null; then
+              DOCKER_COMPOSE_BIN=$(command -v docker-compose)
+              if [ ! -x "$DOCKER_COMPOSE_BIN" ]; then
+                echo "⚠️ docker-compose 실행 권한 수정 중..."
+                chmod +x "$DOCKER_COMPOSE_BIN" || sudo chmod +x "$DOCKER_COMPOSE_BIN"
+              fi
               DOCKER_COMPOSE="docker-compose"
+            else
+              echo "📦 docker-compose 설치 중..."
+              sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+              sudo chmod +x /usr/local/bin/docker-compose
+              DOCKER_COMPOSE="/usr/local/bin/docker-compose"
             fi
 
             if [ ! -f ".previous_image" ]; then
