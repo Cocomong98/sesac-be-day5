@@ -216,7 +216,7 @@ async def rag_node(state: LumiState) -> dict:
             version = doc.get("metadata", {}).get("version", "?")
             similarity = doc.get("similarity", 0)
             logger.debug(
-                f"  [{i+1}] v{version} (sim: {similarity:.3f}): {doc['content'][:50]}..."
+                f"  [{i + 1}] v{version} (sim: {similarity:.3f}): {doc['content'][:50]}..."
             )
 
         logger.info(f"📚 [RAG] 검색 완료: {len(retrieved_docs)}개 문서")
@@ -316,7 +316,7 @@ async def response_node(state: LumiState) -> dict:
     elif intent == "tool":
         # Tool 응답: Tool 실행 결과 포함
         tool_result = state["tool_result"]
-        tool_name = state["tool_name"]
+        # tool_name = state["tool_name"]
 
         # Tool 결과를 자연스러운 응답으로 변환하기 위한 컨텍스트
         result_context = f"""
